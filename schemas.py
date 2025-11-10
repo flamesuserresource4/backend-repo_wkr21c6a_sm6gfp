@@ -41,8 +41,31 @@ class Product(BaseModel):
 # Add your own schemas here:
 # --------------------------------------------------
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Transaction(BaseModel):
+    """
+    Transactions collection schema
+    Collection: "transaction"
+    """
+    amount: float = Field(..., ge=0, description="Transaction amount in USD")
+    merchant: str = Field(..., description="Merchant name")
+    category: str = Field(..., description="Merchant category")
+    distance_from_home: float = Field(..., ge=0, description="Distance from cardholder's home (km)")
+    distance_from_last_transaction: float = Field(..., ge=0, description="Distance from previous transaction (km)")
+    repeat_retailer: bool = Field(..., description="Has the user shopped here before")
+    used_chip: bool = Field(..., description="Chip used for card-present transactions")
+    used_pin_number: bool = Field(..., description="PIN used for authentication")
+    online_order: bool = Field(..., description="Transaction made online")
+    hour: int = Field(..., ge=0, le=23, description="Hour of day in 24h format")
+    age: int = Field(..., ge=16, le=120, description="Cardholder age")
+    international: bool = Field(..., description="Is the merchant international")
+    velocity_24h: int = Field(..., ge=0, description="Number of transactions in last 24 hours")
+
+class Prediction(BaseModel):
+    """
+    Predictions collection schema
+    Collection: "prediction"
+    """
+    transaction: Transaction
+    score: float = Field(..., ge=0, le=1, description="Fraud probability score between 0 and 1")
+    label: str = Field(..., description="Predicted label: 'Fraud' or 'Legit'")
+    explanation: str = Field(..., description="Short explanation of the decision")
